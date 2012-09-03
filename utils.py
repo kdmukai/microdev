@@ -1,4 +1,7 @@
 
+"""--------------------------------------------------------------------------
+    Convenience method to easily access Django's templating engine.
+--------------------------------------------------------------------------"""
 def render_template(template_name, context_dict):
     from django.template.loader import get_template
     from django.template import Context
