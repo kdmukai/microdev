@@ -8,6 +8,4 @@ def send_email(subject, body, from_address, to_address):
     msg = EmailMessage(subject, body, from_address, [to_address])
     msg.send(True)
 
-    print('Sent message to: %s' % to_address)
-    print('Sent message from: %s' % from_address)
     return 1
