@@ -6,7 +6,11 @@ This is mostly for my own uses as I build more projects in Django. Whenever I cr
 
 
 ## ChangeLoggerMixin ##
-The microdev.models.ChangeLoggerMixin provides per-field change logging for any Django model. Here's a simple Django model:
+The microdev.models.ChangeLoggerMixin provides per-field change logging for any Django model. 
+
+
+### Integration ###
+Here's a simple Django model:
 
 ```python
 class MyModel(models.Model):
@@ -33,6 +37,8 @@ class MyModel(models.Model, ChangeLoggerMixin):
 
 The MyModelChangeLog class is a trivial implementation class for the abstract ChangeLog base class.
 
+
+### Usage ###
 Now in your client code you can activate ChangeLoggerMixin logging with two simple calls: track_changes() and log_changes():
 
 ```python
@@ -57,6 +63,8 @@ def do_something(request):
 
 The design assumes a specific Django User is driving these changes and expects the User to be passed in.
 
+
+### Output ###
 You'll see two new MyModelChangeLog entries:
 
 ```
