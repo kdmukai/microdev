@@ -60,23 +60,23 @@ The design assumes a specific Django User is driving these changes and expects t
 You'll see two new MyModelChangeLog entries:
 
 ```
-2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_color: blue->purple
-2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_number: 3->7
+2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_color: blue -> purple
+2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_number: 3 -> 7
 ```
 
 
 ### Customization ###
-Let's say your model has a field that always changes but you don't want to track it. No prob, just override the _change_logger_mixin__ignore_list:
+Let's say your model has a field that always changes but you don't want to track it. No prob, just override the ignore_list:
 
 ```python
 class MyModel(models.Model, ChangeLoggerMixin):
 	favorite_color = models.CharField(max_length=128)
 	favorite_number = models.IntegerField()
-	last_update = models.DateTimeField()
+	date_updated = models.DateTimeField()
 	
     # Overrides from ChangeLoggerMixin
-    _change_logger_mixin__ignore_list = ['last_update',]
+    _change_logger_mixin__ignore_list = ['date_updated',]
     _change_logger_mixin__change_log_class = MyModelChangeLog
 ```
 
-Now any changes to the last_update field will not be logged. 
+Now any changes to the date_updated field will not be logged. 
