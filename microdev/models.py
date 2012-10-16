@@ -35,15 +35,19 @@ class ChangeLog(models.Model):
     
     objects = ChangeLogManager()
 
+    # ***** Override in implementation classes *****
+    def _get_model_name():
+        return 'MyModel'
+
+    
     class Meta:
         abstract = True
         ordering = ('-id',)
     
-    # Override in implementation classes accordingly
     def __init__(self, *args, **kwargs):
         super(ChangeLog, self).__init__(*args, **kwargs)
-        self.model = 'MyModel'
-
+        self.model = self._get_model_name()
+    
     def __unicode__(self):
         if len(self.original_value) > 32:
             _orig_value = self.original_value[:32] + '...'
