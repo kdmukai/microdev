@@ -1,9 +1,8 @@
-microdev
-==========
+# microdev #
 
-A collection of reusable Django utility modules for common methods.
+A collection of reusable Django utility modules.
 
-This is mostly for my own uses as I build more projects in Django. Whenever I create a new method that I'll probably need to re-use later, I'll add it here.
+This is mostly for my own uses as I build more projects in Django. Whenever I create a bit of functionality that I'll probably need to re-use later, I'll add it here.
 
 
 ## ChangeLoggerMixin ##
@@ -13,10 +12,9 @@ The microdev.models.ChangeLoggerMixin provides per-field change logging for any 
 class MyModel(models.Model):
 	favorite_color = models.CharField(max_length=128)
 	favorite_number = models.IntegerField()
-	date_updated = models.DateTimeField()
 ```
 
-Next we add the ChangeLoggerMixin functionality and define a ChangeLog implementation class:
+Next we define a ChangeLog implementation class and add ChangeLoggerMixin to our model:
 
 ```python
 from microdev.models import ChangeLoggerMixin
@@ -35,7 +33,7 @@ class MyModel(models.Model, ChangeLoggerMixin):
 
 The MyModelChangeLog class is a trivial implementation class for the abstract ChangeLog base class.
 
-Now in your client code you can activate ChangeLoggerMixin logging with two simple calls:
+Now in your client code you can activate ChangeLoggerMixin logging with two simple calls: track_changes() and log_changes():
 
 ```python
 def do_something(request):
@@ -66,8 +64,9 @@ You'll see two new MyModelChangeLog entries:
 2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_number: 3->7
 ```
 
+
 ### Customization ###
-Let's say your model has a field that always changes but you don't want to track it. No prob:
+Let's say your model has a field that always changes but you don't want to track it. No prob, just override the _change_logger_mixin__ignore_list:
 
 ```python
 class MyModel(models.Model, ChangeLoggerMixin):

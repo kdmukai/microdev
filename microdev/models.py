@@ -54,7 +54,7 @@ class ChangeLog(models.Model):
             _updated_value = self.updated_value[:32] + '...'
         else:
             _updated_value = self.updated_value[:32]
-        return "%s | User %i | %s %i | %s: %s->%s" % (self.date_created, self.user.id, self.model, self.obj_id, self.field_name, _orig_value, _updated_value)
+        return "%s | User %i | %s %i | %s: %s -> %s" % (self.date_created, self.user.id, self.model, self.obj_id, self.field_name, _orig_value, _updated_value)
 
 
 
