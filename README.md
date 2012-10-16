@@ -37,6 +37,12 @@ class MyModel(models.Model, ChangeLoggerMixin):
 
 The MyModelChangeLog class is a trivial implementation class for the abstract ChangeLog base class.
 
+Remember to run:
+```
+./manage.py syncdb
+```
+This will add the MyModelChangeLog table to your database.
+
 
 ### Usage ###
 Now in your client code you can activate ChangeLoggerMixin logging with two simple calls: track_changes() and log_changes():
