@@ -21,8 +21,8 @@ class MyModel(models.Model):
 Next we define a ChangeLog implementation class and add ChangeLoggerMixin to our model:
 
 ```python
-from microdev.models import ChangeLoggerMixin
 from microdev.models import ChangeLog
+from microdev.models import ChangeLoggerMixin
 	
 class MyModelChangeLog(ChangeLog):
 	pass
@@ -94,3 +94,7 @@ class MyModel(models.Model, ChangeLoggerMixin):
 ```
 
 Now any changes to the date_updated field will not be logged. 
+
+
+### Acknowledgments ###
+The ChangeLoggerMixin was adapted from Armin's original suggestion at: http://stackoverflow.com/a/111364/1639020

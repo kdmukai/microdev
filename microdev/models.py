@@ -59,6 +59,8 @@ class ChangeLog(models.Model):
 
 
 """--------------------------------------------------------------------
+    Modified from:
+    http://stackoverflow.com/a/111364/1639020
 --------------------------------------------------------------------"""
 class ChangeLoggerMixin():
     _original_state = {}
@@ -85,8 +87,5 @@ class ChangeLoggerMixin():
             if key not in self._change_logger_mixin__ignore_list:
                 new_value = self.__dict__.get(key, missing)
                 if str(orig_value) != str(new_value):
-                    print(key)
-                    print(orig_value)
-                    print(new_value)
                     self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value)
                     
