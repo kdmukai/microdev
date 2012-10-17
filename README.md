@@ -97,6 +97,8 @@ class ChangeLog(models.Model):
     updated_value = models.CharField(max_length=VALUE_MAX_LENGTH)
 ```
 
+And obviously the ChangeLog will only log the fields that have changed. Unchanged fields are ignored and won't appear in the log.
+
 
 ### Customization ###
 Let's say your model has a field that always changes but you don't want to track it. No prob, just override the ignore_list:
