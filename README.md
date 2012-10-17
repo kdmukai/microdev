@@ -22,7 +22,7 @@ class MyModel(models.Model):
 	favorite_number = models.IntegerField()
 ```
 
-Next we define a ChangeLog implementation class and add ChangeLoggerMixin to our model:
+Next we define a trivial ChangeLog implementation class and add ChangeLoggerMixin to our model:
 
 ```python
 from microdev.models import ChangeLog
@@ -39,7 +39,7 @@ class MyModel(models.Model, ChangeLoggerMixin):
     _change_logger_mixin__change_log_class = MyModelChangeLog
 ```
 
-The MyModelChangeLog class is a trivial implementation class for the abstract ChangeLog base class.
+The \_change_logger_mixin__change_log_class variable just needs to point to the ChangeLog implementation class so that the mix-in will know where to write the log entries. You don't have to have a dedicated per-model ChangeLog implementation class. You could have all models write to the same ChangeLog implementation class, but it seems cleaner to me for each model to have its own separate set of logs.
 
 Remember to run:
 ```
