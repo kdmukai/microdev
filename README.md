@@ -39,7 +39,7 @@ class MyModel(models.Model, ChangeLoggerMixin):
     _change_logger_mixin__change_log_class = MyModelChangeLog
 ```
 
-The \_change_logger_mixin__change_log_class variable just needs to point to the ChangeLog implementation class so that the mix-in will know where to write the log entries. You don't have to have a dedicated per-model ChangeLog implementation class. You could have all models write to the same ChangeLog implementation class, but it seems cleaner to me for each model to have its own separate set of logs.
+The \_change\_logger\_mixin\_\_change\_log\_class variable just needs to point to the ChangeLog implementation class so that the mix-in will know where to write the log entries. You don't have to have a dedicated per-model ChangeLog implementation class. You could have all models write to the same ChangeLog implementation class, but it seems cleaner to me for each model to have its own separate set of logs.
 
 Remember to run:
 ```
