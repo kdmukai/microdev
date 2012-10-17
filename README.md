@@ -6,7 +6,11 @@ This is mostly for my own uses as I build more projects in Django. Whenever I cr
 
 
 ## ChangeLoggerMixin ##
-The microdev.models.ChangeLoggerMixin provides per-field change logging for any Django model. 
+The microdev.models.ChangeLoggerMixin provides per-field change logging for any Django model.
+
+The database can only keep track of a model instance's latest state, but there are plenty of use cases where it's important or useful to keep track of previous states. There are basic auditing uses but, more interestingly, tracking previous states opens up new avenues for data analysis.
+
+For example, if you were running a dating site, you could average all users' popularity before and after changing their smoker status to "I quit". 
 
 
 ### Integration ###
@@ -76,6 +80,21 @@ You'll see two new MyModelChangeLog entries:
 ```
 2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_color: blue -> purple
 2012-10-16 22:20:19+00:00 | User 1001 | MyModel 5 | favorite_number: 3 -> 7
+```
+
+That's the \_\_unicode\_\_ output. The actual ChangeLog keeps all the data separated out to make it easy to run queries against it later. Here's the ChangeLog structure:
+
+```python
+class ChangeLog(models.Model):
+    VALUE_MAX_LENGTH = 1024
+    
+    date_created = CreationDateTimeField()
+    user = models.ForeignKey(User)
+    model = models.CharField(max_length=128)
+    obj_id = models.IntegerField()
+    field_name = models.CharField(max_length=128)
+    original_value = models.CharField(max_length=VALUE_MAX_LENGTH)
+    updated_value = models.CharField(max_length=VALUE_MAX_LENGTH)
 ```
 
 
