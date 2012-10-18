@@ -76,6 +76,22 @@ class ChangeLoggerMixin():
     def track_changes(self):
         self._original_state = dict(self.__dict__)
     
+    
+    # Check model's status - name is extended to avoid namespace conflicts
+    def change_logger_mixin__is_changed(self):
+        if not self._change_logger_mixin__change_log_class:
+            raise Exception('microdev.models.ChangeLoggerMixin: _change_logger_mixin__change_log_class was not defined in the implementation class %s' % self.__class__.__name__)
+            return
+        
+        missing = None
+        for key, orig_value in self._original_state.iteritems():
+            if key not in self._change_logger_mixin__ignore_list:
+                new_value = self.__dict__.get(key, missing)
+                if str(orig_value) != str(new_value):
+                    return True
+        return False
+
+                    
     # Log any changes to the instance to the specified change_log_class
     def log_changes(self, user):
         if not self._change_logger_mixin__change_log_class:
