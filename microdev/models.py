@@ -101,7 +101,7 @@ class ChangeLoggerMixin():
         
         missing = None
         for key, orig_value in self._original_state.iteritems():
-            if key not in self._change_logger_mixin__ignore_list:
+            if key not in self._change_logger_mixin__ignore_list and key != '_original_state':
                 new_value = self.__dict__.get(key, missing)
                 if str(orig_value) != str(new_value):
                     self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value)
