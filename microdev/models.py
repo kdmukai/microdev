@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django_extensions.db.fields import CreationDateTimeField
+import shortuuid
 
 
 
@@ -104,4 +105,16 @@ class ChangeLoggerMixin():
                 new_value = self.__dict__.get(key, missing)
                 if str(orig_value) != str(new_value):
                     self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value)
-                    
+
+
+class ShortUuidModel(models.Model):
+    uuid = models.CharField(max_length=22)
+
+    class Meta:
+        abstract = True
+        
+        
+    def save(self):
+        if not self.uuid:
+            self.uuid = shortuuid.uuid()
+        super(ShortUuidModel, self).save()
