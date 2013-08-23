@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib import admin
 from django_extensions.db.fields import CreationDateTimeField
 import shortuuid
 
@@ -108,13 +109,15 @@ class ChangeLoggerMixin():
 
 
 class ShortUuidModel(models.Model):
-    uuid = models.CharField(max_length=22)
+    uuid = models.CharField(max_length=22, null=True, blank=True)
 
     class Meta:
         abstract = True
-        
-        
+
     def save(self):
         if not self.uuid:
             self.uuid = shortuuid.uuid()
         super(ShortUuidModel, self).save()
+
+class ShortUuidModelAdmin(admin.ModelAdmin):
+    readonly_fields = ('uuid',)
