@@ -17,6 +17,21 @@ class EmailForm(forms.Form):
 
 
 """--------------------------------------------------------------------------
+    A trivial Form to handle simple File upload pages. DRY, right?
+--------------------------------------------------------------------------"""
+class FileForm(forms.Form):
+	file = forms.FileField(required=True)
+
+
+"""--------------------------------------------------------------------------
+    A trivial Form to handle simple CSV File upload pages. DRY, right?
+--------------------------------------------------------------------------"""
+class CsvFileForm(forms.Form):
+	file = forms.FileField(required=True)
+	has_header_row = forms.BooleanField()
+
+
+"""--------------------------------------------------------------------------
     A trivial Form to handle simple password entry pages. DRY, right?
 --------------------------------------------------------------------------"""
 class PasswordForm(forms.Form):
