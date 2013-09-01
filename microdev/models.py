@@ -4,7 +4,6 @@ from django_extensions.db.fields import CreationDateTimeField
 import shortuuid
 
 
-
 class ChangeLogManager(models.Manager):
     
     def log_change(self, user, model, obj_id, field_name, original_value, updated_value):
