@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib import admin
-from django_extensions.db.fields import CreationDateTimeField
+from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 import shortuuid
 
 
@@ -124,6 +124,23 @@ class ShortUuidModel(models.Model):
 
 class ShortUuidModelAdmin(admin.ModelAdmin):
 	readonly_fields = ('uuid',)
+
+
+
+class TimestampModel(models.Model):
+	"""
+		Abstract base class that automatically logs date_created and
+		date_updated
+	"""
+	date_created = CreationDateTimeField()
+	date_updated = ModificationDateTimeField()
+
+	class Meta:
+		abstract = True
+
+class TimestampModelAdmin(admin.ModelAdmin):
+	readonly_fields = ('date_created', 'date_updated',)
+
 
 
 class CsrNoteModel(models.Model):
