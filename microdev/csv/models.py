@@ -26,12 +26,6 @@ class CsvImport(models.Model):
 
 	column_headers = property(get_column_headers, set_column_headers)
 
-class CsvImportAdmin(admin.ModelAdmin):
-	readonly_fields = ('date_created',)
-
-	class Meta:
-		model = CsvImport
-
 
 class CsvImportRow(models.Model):
 	csv_import = models.ForeignKey(CsvImport)
@@ -50,3 +44,19 @@ class CsvImportRow(models.Model):
 			self._json_data = json.dumps(value)
 
 	data_dict = property(get_data_dict, set_data_dict)
+
+	def __unicode__(self):
+		return "%d" % self.id
+
+class CsvImportRowInline(admin.StackedInline):
+	model = CsvImportRow
+	readonly_fields = ('_json_data',)
+	extra = 0
+
+class CsvImportAdmin(admin.ModelAdmin):
+	inlines=[CsvImportRowInline,]
+	readonly_fields = ('date_created',)
+
+	class Meta:
+		model = CsvImport
+
