@@ -1,6 +1,7 @@
-import csv
+import unicodecsv
 
 from django.db import transaction
+from django.http import HttpResponse
 
 from microdev.csv.models import CsvImport, CsvImportRow
 
@@ -20,7 +21,7 @@ def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_
 	column_headers = []
 	if has_header_row:
 		# Read and store the header row column names
-		r = csv.reader(csv_file.read().splitlines())
+		r = unicodecsv.reader(csv_file.read().splitlines(), encoding='utf-8')
 		row = r.next()
 		for column_header in row:
 			column_headers.append(column_header)
@@ -38,7 +39,7 @@ def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_
 
 	with transaction.commit_on_success():
 		csv_file.seek(0)
-		for index, row in enumerate(csv.reader(csv_file.read().splitlines())):
+		for index, row in enumerate(unicodecsv.reader(csv_file.read().splitlines(), encoding='utf-8')):
 			if index == 0 and has_header_row:
 				# Don't save the header row as data
 				continue
@@ -62,3 +63,24 @@ def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_
 	# ...Ends transaction
 
 	return csv_import
+
+
+
+
+def generate_csv_response(data_array, output_filename, headers=None):
+	# Create the HttpResponse object with the appropriate CSV header.
+	response = HttpResponse(content_type='text/csv')
+	if not output_filename.endswith(".csv"):
+		output_filename += ".csv"
+	response['Content-Disposition'] = 'attachment; filename="%s"' % output_filename
+
+	writer = unicodecsv.writer(response, encoding='utf-8')
+
+	if headers:
+		writer.writerow(headers)
+	for data_row in data_array:
+		writer.writerow(data_row)
+
+	return response
+
+
