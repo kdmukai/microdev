@@ -6,7 +6,7 @@ from django.utils.translation import gettext as _
     A trivial Form to handle simple checkbox confirmation pages. DRY, right?
 --------------------------------------------------------------------------"""
 class ConfirmCheckboxForm(forms.Form):
-    confirm = forms.BooleanField(required=True, label=_('Confirm checkbox'))
+    confirm = forms.BooleanField(required=True, label=_('Confirm'))
 
 
 """--------------------------------------------------------------------------
@@ -14,6 +14,13 @@ class ConfirmCheckboxForm(forms.Form):
 --------------------------------------------------------------------------"""
 class EmailForm(forms.Form):
 	email = forms.EmailField(required=True)
+
+
+"""--------------------------------------------------------------------------
+    A trivial Form to handle simple File upload pages. DRY, right?
+--------------------------------------------------------------------------"""
+class FileForm(forms.Form):
+	file = forms.FileField(required=True)
 
 
 """--------------------------------------------------------------------------
