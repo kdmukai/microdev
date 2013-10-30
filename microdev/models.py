@@ -67,7 +67,7 @@ class ChangeLoggerMixin():
 	_original_state = {}
 	
 	# Override in the implementation class to exclude change tracking on listed fields
-	_change_logger_mixin__ignore_list = []
+	_change_logger_mixin__ignore_list = ['date_updated']
 	
 	# Must override to specify which ChangeLog implementation class to write to
 	_change_logger_mixin__change_log_class = None
@@ -105,6 +105,27 @@ class ChangeLoggerMixin():
 				new_value = self.__dict__.get(key, missing)
 				if str(orig_value) != str(new_value):
 					self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value)
+
+
+class UuidModel(models.Model):
+	"""
+		A simple abstract base class to automatically generate a standard UUID 
+		for each instance of a model.
+	"""
+	uuid = models.CharField(max_length=36, null=True, blank=True)
+
+	class Meta:
+		abstract = True
+
+	def save(self):
+		if not self.uuid:
+			import uuid
+			self.uuid = uuid.uuid4()
+		super(UuidModel, self).save()
+
+class UuidModelAdmin(admin.ModelAdmin):
+	readonly_fields = ('uuid',)
+
 
 
 class ShortUuidModel(models.Model):
