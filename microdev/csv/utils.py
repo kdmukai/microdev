@@ -9,8 +9,11 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_fields=[]):
-	logger.debug("ingest_csv called")
+def validate_and_return_rows(csv_file_form=None, csv_file=None, has_header_row=True, required_fields=[]):
+	"""
+		Opens a CSV file and optionally checks for required fields in the header. Returns
+		the rows of the CSV and a list of the headers as a tuple: (csv_rows, headers)
+	"""
 	if csv_file_form:
 		csv_file = csv_file_form.cleaned_data['file']
 		has_header_row = csv_file_form.cleaned_data['has_header_row']
@@ -26,10 +29,20 @@ def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_
 		for column_header in row:
 			column_headers.append(column_header)
 
-	# Check for required fields (optional check)
-	for field in required_fields:
-		if field not in column_headers:
-			raise Exception("Invalid CSV file. Must contain %s." % field)
+		# Check for required fields (optional check)
+		for field in required_fields:
+			if field not in column_headers:
+				raise Exception("Invalid CSV file. Must contain %s." % field)
+
+	csv_file.seek(0)
+	return (unicodecsv.reader(csv_file.read().splitlines(), encoding='utf-8'), column_headers)
+
+
+
+def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_fields=[]):
+	logger.debug("ingest_csv called")
+
+	csv_rows, column_headers = validate_and_return_rows(csv_file_form, csv_file, has_header_row, required_fields)
 
 	# Create the parent CsvImport record
 	csv_import = CsvImport(
@@ -38,8 +51,7 @@ def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_
 	csv_import.save()
 
 	with transaction.commit_on_success():
-		csv_file.seek(0)
-		for index, row in enumerate(unicodecsv.reader(csv_file.read().splitlines(), encoding='utf-8')):
+		for index, row in enumerate(csv_rows):
 			if index == 0 and has_header_row:
 				# Don't save the header row as data
 				continue
@@ -63,6 +75,7 @@ def ingest_csv(csv_file_form=None, csv_file=None, has_header_row=True, required_
 	# ...Ends transaction
 
 	return csv_import
+
 
 
 
