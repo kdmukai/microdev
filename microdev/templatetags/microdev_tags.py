@@ -34,7 +34,7 @@ def get_range( value ):
 		Returns a standard Python zero-based range.
 
 		from: https://djangosnippets.org/snippets/1357/
-		
+
 		Filter - returns a list containing range made from given value
 		Usage (in template):
 
@@ -57,9 +57,19 @@ def get_range( value ):
 
 
 @register.filter
+def get_range0( value ):
+	""" 
+		Convenience filter to make range numbering explicit to avoid
+		any confusion. Also matches Django's forloop.counter0 
+		convention.
+	"""
+	return get_range(value)
+
+
+@register.filter
 def get_range1( value ):
 	"""
-		Same as get_range but with 1-based range, end inclusive.
+		Same as get_range but with a 1-based range, end inclusive.
 
 		<ul>
 			{% for i in 3|get_range1 %}
