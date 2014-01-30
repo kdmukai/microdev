@@ -4,6 +4,10 @@ from django.contrib import admin
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 import shortuuid
 
+from django.contrib.contenttypes.models import ContentType
+
+from django.contrib.contenttypes import generic
+
 from django.conf import settings
 
 from django.utils.encoding import smart_str
@@ -11,7 +15,7 @@ from django.utils.encoding import smart_str
 
 class ChangeLogManager(models.Manager):
 	
-	def log_change(self, user, model, obj_id, field_name, original_value, updated_value):
+	def log_change(self, user, model, obj_id, field_name, original_value, updated_value, content_type):
 		if len(smart_str(original_value)) > ChangeLog.VALUE_MAX_LENGTH:
 			original_value = smart_str(original_value)[:(ChangeLog.VALUE_MAX_LENGTH-3)] + '...'
 
@@ -19,22 +23,34 @@ class ChangeLogManager(models.Manager):
 			updated_value = smart_str(updated_value)[:(ChangeLog.VALUE_MAX_LENGTH-3)] + '...'
 
 		# Create the new log entry
-		self.get_query_set().create(user=user, model=model, obj_id=obj_id, field_name=field_name, original_value=smart_str(original_value), updated_value=smart_str(updated_value))
+		self.get_query_set().create(
+									user           =user, 
+									model          =model, 
+									obj_id         =obj_id, 
+									field_name     =field_name, 
+									original_value =smart_str(original_value), 
+									updated_value  =smart_str(updated_value), 
+									object_content_type   = content_type)
 
-
+		# Better readability of long strings
 """--------------------------------------------------------------------
 	Abstract 
 --------------------------------------------------------------------"""
 class ChangeLog(models.Model):
 	VALUE_MAX_LENGTH = 1024
 	
-	date_created = CreationDateTimeField()
-	user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
-	model = models.CharField(max_length=128)
-	obj_id = models.IntegerField()
-	field_name = models.CharField(max_length=128)
-	original_value = models.CharField(max_length=VALUE_MAX_LENGTH)
-	updated_value = models.CharField(max_length=VALUE_MAX_LENGTH)
+
+	object_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_object_content_type", null=True)
+	obj_id              = models.IntegerField()
+	object_instance     = generic.GenericForeignKey('object_content_type', 'obj_id')
+	# By combining 'object_content_type' and 'obj_id' we are able to get the actual model instance for which we are saving the ChangeLog
+	
+	date_created        = CreationDateTimeField()
+	user                = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+	model               = models.CharField(max_length=128)
+	field_name          = models.CharField(max_length=128)
+	original_value      = models.CharField(max_length=VALUE_MAX_LENGTH)
+	updated_value       = models.CharField(max_length=VALUE_MAX_LENGTH)
 	
 	objects = ChangeLogManager()
 
@@ -88,13 +104,18 @@ class ChangeLoggerMixin():
 			raise Exception('microdev.models.ChangeLoggerMixin: _change_logger_mixin__change_log_class was not defined in the implementation class %s' % self.__class__.__name__)
 			return
 		
+
+
 		missing = None
 		with transaction.commit_on_success():	# Batches up all the log entry saves
 			for key, orig_value in self._original_state.iteritems():
 				if key not in self._change_logger_mixin__ignore_list and key != '_original_state':
 					new_value = self.__dict__.get(key, missing)
 					if smart_str(orig_value) != smart_str(new_value):
-						self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value)
+						# This allows us to get the object's content type to be able to automatically save and store the GenericForeignKey
+						content_type = ContentType.objects.get_for_model(self)
+						
+						self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value, content_type)
 
 
 
