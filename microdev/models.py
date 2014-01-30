@@ -4,18 +4,22 @@ from django.contrib import admin
 from django_extensions.db.fields import CreationDateTimeField, ModificationDateTimeField
 import shortuuid
 
+from django.conf import settings
+
+from django.utils.encoding import smart_str
+
 
 class ChangeLogManager(models.Manager):
 	
 	def log_change(self, user, model, obj_id, field_name, original_value, updated_value):
-		if len(str(original_value)) > ChangeLog.VALUE_MAX_LENGTH:
-			original_value = str(original_value)[:(ChangeLog.VALUE_MAX_LENGTH-3)] + '...'
+		if len(smart_str(original_value)) > ChangeLog.VALUE_MAX_LENGTH:
+			original_value = smart_str(original_value)[:(ChangeLog.VALUE_MAX_LENGTH-3)] + '...'
 
-		if len(str(updated_value)) > ChangeLog.VALUE_MAX_LENGTH:
-			updated_value = str(updated_value)[:(ChangeLog.VALUE_MAX_LENGTH-3)] + '...'
+		if len(smart_str(updated_value)) > ChangeLog.VALUE_MAX_LENGTH:
+			updated_value = smart_str(updated_value)[:(ChangeLog.VALUE_MAX_LENGTH-3)] + '...'
 
 		# Create the new log entry
-		self.get_query_set().create(user=user, model=model, obj_id=obj_id, field_name=field_name, original_value=str(original_value), updated_value=str(updated_value))
+		self.get_query_set().create(user=user, model=model, obj_id=obj_id, field_name=field_name, original_value=smart_str(original_value), updated_value=smart_str(updated_value))
 
 
 """--------------------------------------------------------------------
@@ -25,7 +29,7 @@ class ChangeLog(models.Model):
 	VALUE_MAX_LENGTH = 1024
 	
 	date_created = CreationDateTimeField()
-	user = models.ForeignKey(User, blank=True, null=True)
+	user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 	model = models.CharField(max_length=128)
 	obj_id = models.IntegerField()
 	field_name = models.CharField(max_length=128)
@@ -72,7 +76,7 @@ class ChangeLoggerMixin():
 		for key, orig_value in self._original_state.iteritems():
 			if key not in self._change_logger_mixin__ignore_list:
 				new_value = self.__dict__.get(key, missing)
-				if str(orig_value) != str(new_value):
+				if smart_str(orig_value) != smart_str(new_value):
 					return True
 		return False
 
@@ -89,7 +93,7 @@ class ChangeLoggerMixin():
 			for key, orig_value in self._original_state.iteritems():
 				if key not in self._change_logger_mixin__ignore_list and key != '_original_state':
 					new_value = self.__dict__.get(key, missing)
-					if str(orig_value) != str(new_value):
+					if smart_str(orig_value) != smart_str(new_value):
 						self._change_logger_mixin__change_log_class.objects.log_change(user, self.__class__.__name__, self.id, key, orig_value, new_value)
 
 
@@ -184,7 +188,7 @@ class CsrNoteModel(models.Model):
 	"""
 	note = models.TextField()
 	date_created = CreationDateTimeField()
-	csr_agent = models.ForeignKey('auth.User', null=True, blank=True)
+	csr_agent = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True)
 
 	class Meta:
 		abstract = True
