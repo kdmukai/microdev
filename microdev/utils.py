@@ -1,3 +1,6 @@
+import logging
+default_logger = logging.getLogger(__name__)
+
 
 """--------------------------------------------------------------------------
     Convenience method to easily access Django's templating engine.
@@ -12,6 +15,18 @@ def render_template(template_name, context_dict):
     # Render and return as a string...
     return get_template(template_name).render(context)
 
+
+def dump_post(request, logger=None):
+    """
+        Just spits out every POST key and value in the request
+        Specify optional logger to control output.
+    """
+    for key in request.POST.keys():
+        output_str = "%s: %s" % (key, request.POST[key])
+        if logger:
+            logger.debug(output_str)
+        else:
+            default_logger.debug(output_str)
 
 
 """--------------------------------------------------------------------------
