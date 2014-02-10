@@ -176,9 +176,13 @@ class ShortUuidModel(models.Model):
 	class Meta:
 		abstract = True
 
-	def save(self, *args, **kwargs):
+	def generate_uuid(self):
 		if not self.uuid:
 			self.uuid = shortuuid.uuid()
+
+	def save(self, *args, **kwargs):
+		if not self.uuid:
+			self.generate_uuid()
 		super(ShortUuidModel, self).save(*args, **kwargs)
 
 class ShortUuidModelAdmin(admin.ModelAdmin):
