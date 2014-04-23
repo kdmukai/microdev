@@ -18,6 +18,16 @@ def get_item(dictionary, key):
 
 
 @register.filter
+def lookup(d, key):
+	"""
+		A simpler filter to provide dict key access AND list indexing.
+
+		usage: {% my_dict|get_item:my_key %}
+	"""
+	return d[key]
+
+
+@register.filter
 def show_errors(form):
 	"""
 		Displays form errors using the template specified.
@@ -85,3 +95,87 @@ def get_range1( value ):
 		</ul>
 	"""
 	return range( 1, int(value)+1 )
+
+
+@register.filter(is_safe=True)
+def floatformat_minmax(text, args='1,3'):
+	"""
+	Displays a float to a specified number of decimal places.
+
+	* num1 = 34.23234
+	* num2 = 34.00000
+	* num3 = 34.26000
+	* {{ num1|floatformat_minmax:'1,3' }} displays "34.232"
+	* {{ num2|floatformat_minmax:'1,3' }} displays "34.0"
+	* {{ num3|floatformat_minmax:'1,3' }} displays "34.26"
+	"""
+	import six
+	from decimal import Decimal, InvalidOperation, Context, ROUND_HALF_UP
+	from django.template.defaultfilters import special_floats
+	from django.utils.encoding import force_text
+	from django.utils import formats
+	from django.utils.safestring import mark_safe
+
+	arg_list = [int(arg) for arg in args.split(',')]
+
+	min_digits = arg_list[0]
+	max_digits = arg_list[1]
+
+	try:
+		input_val = force_text(text)
+		d = Decimal(input_val)
+	except UnicodeEncodeError:
+		return ''
+	except InvalidOperation:
+		if input_val in special_floats:
+			return input_val
+		try:
+			d = Decimal(force_text(float(text)))
+		except (ValueError, InvalidOperation, TypeError, UnicodeEncodeError):
+			return ''
+	try:
+		p = int(max_digits)
+	except ValueError:
+		return input_val
+
+	try:
+		m = int(d) - d
+	except (ValueError, OverflowError, InvalidOperation):
+		return input_val
+
+	if not m and p < 0:
+		return mark_safe(formats.number_format('%d' % (int(d)), 0))
+
+	if p == 0:
+		exp = Decimal(1)
+	else:
+		exp = Decimal('1.0') / (Decimal(10) ** abs(p))
+	try:
+		# Set the precision high enough to avoid an exception, see #15789.
+		tupl = d.as_tuple()
+		units = len(tupl[1]) - tupl[2]
+		prec = abs(p) + units + 1
+
+		# Avoid conversion to scientific notation by accessing `sign`, `digits`
+		# and `exponent` from `Decimal.as_tuple()` directly.
+		sign, digits, exponent = d.quantize(exp, ROUND_HALF_UP,
+			Context(prec=prec)).as_tuple()
+		digits = [six.text_type(digit) for digit in reversed(digits)]
+		while len(digits) <= abs(exponent):
+			digits.append('0')
+		digits.insert(-exponent, '.')
+		if sign:
+			digits.append('-')
+		number = ''.join(reversed(digits))
+		number_str = formats.number_format(number, abs(p))
+
+		decimal_splits = number_str.rsplit('.')
+		decimal_str = decimal_splits[1]
+		while decimal_str[-1:] == '0' and len(decimal_str) > min_digits:
+			decimal_str = decimal_str[0:(len(decimal_str)-1)]
+
+		new_decimal_str = "%s.%s" % (decimal_splits[0], decimal_str)
+
+		return mark_safe(new_decimal_str)
+	except InvalidOperation:
+		return input_val
