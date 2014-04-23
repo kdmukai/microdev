@@ -145,7 +145,7 @@ class UuidModel(models.Model):
 		A simple abstract base class to automatically generate a standard UUID 
 		for each instance of a model.
 	"""
-	uuid = models.CharField(max_length=36, null=True, blank=True)
+	uuid = models.CharField(max_length=36, db_index=True, null=True, blank=True)
 
 	class Meta:
 		abstract = True
@@ -171,7 +171,7 @@ class ShortUuidModel(models.Model):
 		A simple abstract base class to automatically generate a short UUID 
 		for each instance of a model.
 	"""
-	uuid = models.CharField(max_length=22, null=True, blank=True)
+	uuid = models.CharField(max_length=22, db_index=True, null=True, blank=True)
 
 	class Meta:
 		abstract = True
