@@ -133,9 +133,16 @@ class ChangeLoggedModel(models.Model, ChangeLoggerMixin):
 			# Only track changes after initial save
 			self.track_changes()
 
+
 	def save(self, *args, **kwargs):
 		if self.pk:
 			self.log_changes(user=kwargs.pop("changed_by", None))
+
+		else:
+			# for now discard the changed_by value on initial save calls
+			#	since we don't log changes until after initial save.
+			kwargs.pop("changed_by", None)
+
 		super(ChangeLoggedModel, self).save(*args, **kwargs)
 
 
