@@ -2,6 +2,12 @@ import logging
 default_logger = logging.getLogger(__name__)
 
 
+def md5_hash_encode(cleartext):
+    from Crypto.Hash import MD5
+    return MD5.new(cleartext).hexdigest()
+
+
+
 """--------------------------------------------------------------------------
     Convenience method to easily access Django's templating engine.
 --------------------------------------------------------------------------"""

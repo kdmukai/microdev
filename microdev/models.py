@@ -135,7 +135,7 @@ class ChangeLoggedModel(models.Model, ChangeLoggerMixin):
 
 	def save(self, *args, **kwargs):
 		if self.pk:
-			self.log_changes()
+			self.log_changes(user=kwargs.pop("changed_by", None))
 		super(ChangeLoggedModel, self).save(*args, **kwargs)
 
 
@@ -143,7 +143,7 @@ class ChangeLoggedModel(models.Model, ChangeLoggerMixin):
 class UuidModel(models.Model):
 	"""
 		A simple abstract base class to automatically generate a standard UUID 
-		for each instance of a model.
+		for each instance of a model. Note - Dashes are now omitted from the UUID!
 	"""
 	uuid = models.CharField(max_length=36, db_index=True, null=True, blank=True)
 
@@ -154,7 +154,7 @@ class UuidModel(models.Model):
 		""" Can be explictly called at any time and will be automatically called on save
 			if uuid is None """
 		import uuid
-		self.uuid = uuid.uuid4()
+		self.uuid = str(uuid.uuid4()).replace('-', '')
 
 	def save(self, *args, **kwargs):
 		if not self.uuid:
