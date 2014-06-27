@@ -179,3 +179,10 @@ def floatformat_minmax(text, args='1,3'):
 		return mark_safe(new_decimal_str)
 	except InvalidOperation:
 		return input_val
+
+
+@register.filter
+def mask_ip( value ):
+	return '%s.xxx.xxx.%s' % (value.split('.',1)[0], value.rsplit('.',1)[1])
+
+
