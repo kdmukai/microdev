@@ -35,6 +35,16 @@ def dump_post(request, logger=None):
             default_logger.debug(output_str)
 
 
+def dump_post_str(request):
+    """
+        Just spits out every POST key and value in the request
+    """
+    output_str = ""
+    for key in request.POST.keys():
+        output_str += "%s: %s\n" % (key, request.POST[key])
+    return output_str
+
+
 """--------------------------------------------------------------------------
     Access Google's free currency exchange API.
 
