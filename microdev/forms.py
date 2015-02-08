@@ -40,3 +40,18 @@ class PasswordForm(forms.Form):
 
 		# Always return the full collection of cleaned data.
 		return cleaned_data
+
+
+
+class ContactUsForm(forms.Form):
+	"""
+		Simple Contact Us form using a ReCaptchaField
+
+		pip install django-recaptcha 
+	"""
+	from captcha.fields import ReCaptchaField
+	name = forms.CharField(max_length="64", required=False)
+	email = forms.EmailField(required=True)
+	message = forms.CharField(widget=forms.Textarea, required=True)
+	captcha = ReCaptchaField(attrs={'theme' : 'white'})
+

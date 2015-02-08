@@ -208,6 +208,17 @@ class TimestampModel(models.Model):
 	class Meta:
 		abstract = True
 
+class TimestampIndexedModel(models.Model):
+	"""
+		Abstract base class that automatically logs date_created and
+		date_updated --with date_updated indexed.
+	"""
+	date_created = CreationDateTimeField()
+	date_updated = ModificationDateTimeField(db_index=True)
+
+	class Meta:
+		abstract = True
+
 class TimestampModelAdmin(admin.ModelAdmin):
 	readonly_fields = ('date_created', 'date_updated',)
 
