@@ -68,27 +68,35 @@ def server_oauth2callback(client_id, client_secret, oauth_scope, redirect_uri, c
 
 def _get_server_credentials():
 	# Retrieve only the most recent ServerCredentials entry
-	server_credentials = ServerCredentials.objects.all().order_by('-pk')[:1]
-
-	if not server_credentials:
-		logger.error("No ServerCredentials found!")
-		return None
-
-	else:
-		# Return the Google client API's native credentials object
-		return server_credentials[0].credentials
-
-
-def _get_drive_api_service():
-	http = httplib2.Http()
-
-	server_credentials = _get_server_credentials()
-	if not server_credentials:
+	try:
+		server_credentials = ServerCredentials.objects.all().order_by('-pk')[:1][0]
+	except KeyError:
 		logger.error("No ServerCredentials found!")
 		raise Exception("No ServerCredentials found!")
 
+	else:
+		# Do this in a transaction to isolate the update
+		with transaction.commit_on_success():
+			# Extract the Google client API's native credentials object
+			credentials = server_credentials.credentials
+
+			# Refresh the token if it's expired
+			if credentials.access_token_expired:
+				http = httplib2.Http()
+				credentials.refresh(http)
+
+				# Update the object in the DB
+				server_credentials.credentials = credentials
+				server_credentials.save()
+
+		return credentials
+
+
+def _get_drive_api_service():
+	server_credentials = _get_server_credentials()
+
 	# Use the credentials to authorize an http request object
-	http = server_credentials.authorize(http)
+	http = server_credentials.authorize(httplib2.Http(timeout=60))
 
 	# Build the Drive API service object using the authorized
 	#	http request and return both
