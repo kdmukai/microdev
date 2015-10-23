@@ -1,3 +1,7 @@
+microdev.egg-info
+build/
+dist/
+MANIFEST
 *.log
 *.pot
 *.pyc
