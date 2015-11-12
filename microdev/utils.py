@@ -11,11 +11,10 @@ def md5_hash_encode(cleartext):
 	return MD5.new(cleartext).hexdigest()
 
 
-
-"""--------------------------------------------------------------------------
-	Convenience method to easily access Django's templating engine.
---------------------------------------------------------------------------"""
 def render_template(template_name, context_dict):
+	"""
+		Convenience method to easily access Django's templating engine.
+	"""
 	from django.template.loader import get_template
 	from django.template import Context
 
@@ -56,27 +55,36 @@ def format_email_addressee(user):
 		return user.email
 
 
-
 def dump_post_str(request):
-    """
-        Just spits out every POST key and value in the request
-    """
-    output_str = ""
-    for key in request.POST.keys():
-        output_str += "%s: %s\n" % (key, request.POST[key])
-    return output_str
+	"""
+		Just spits out every POST key and value in the request
+	"""
+	output_str = ""
+	for key in request.POST.keys():
+		output_str += "%s: %s\n" % (key, request.POST[key])
+	return output_str
 
 
-"""--------------------------------------------------------------------------
-	Access Google's free currency exchange API.
+def utc_to_localtime(utc_datetime, local_tz_name):
+	"""
+		Convert a TZ-aware datetime from UTC to the target named time zone
 
-	Use the 3-char ISO currency codes to specify source and target currency.
-	
-	Usage:
-	Convert $15.43USD to Euros:
-	amt_in_euros = 15.43 * get_current_exchange_rate('USD', 'EUR')
---------------------------------------------------------------------------"""
+		utc_to_localtime(my_utc_datetime, 'America/Chicago')
+	"""
+	import pytz
+	return utc_datetime.replace(tzinfo=pytz.utc).astimezone( pytz.timezone(local_tz_name) )
+
+
 def get_current_exchange_rate(src_currency, tgt_currency):
+	"""
+		Access Google's free currency exchange API.
+
+		Use the 3-char ISO currency codes to specify source and target currency.
+		
+		Usage:
+		Convert $15.43USD to Euros:
+		amt_in_euros = 15.43 * get_current_exchange_rate('USD', 'EUR')
+	"""
 	import urllib2
 
 	response = urllib2.urlopen('http://www.google.com/ig/calculator?hl=en&q=1%s=?%s' % (src_currency, tgt_currency))

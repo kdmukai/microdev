@@ -25,6 +25,9 @@ class AbstractUsPostalAddress(PostalAddress):
 		abstract = True
 
 	def __unicode__(self):
+		return self.get_address()
+
+	def get_address(self):
 		if self.address_line_2:
 			return "%s, %s, %s, %s %s" % (self.address_line_1, self.address_line_2, self.city, self.state, self.zip_code)
 		else:
