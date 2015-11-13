@@ -65,14 +65,15 @@ def dump_post_str(request):
 	return output_str
 
 
-def utc_to_localtime(utc_datetime, local_tz_name):
+def utc_to_localtime(utc_datetime, local_tz):
 	"""
 		Convert a TZ-aware datetime from UTC to the target named time zone
 
-		utc_to_localtime(my_utc_datetime, 'America/Chicago')
+		local_tz = pytz.timezone('America/Chicago')
+		utc_to_localtime(my_utc_datetime, local_tz)
 	"""
 	import pytz
-	return utc_datetime.replace(tzinfo=pytz.utc).astimezone( pytz.timezone(local_tz_name) )
+	return utc_datetime.replace(tzinfo=pytz.utc).astimezone( local_tz )
 
 
 def get_current_exchange_rate(src_currency, tgt_currency):
