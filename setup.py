@@ -11,14 +11,15 @@ def read(fname):
 
 setup(
     name="microdev",
-    version="0.0.5",
+    version="0.0.7",
     author="Keith Mukai",
     author_email="keith.mukai@essaytagger.com",
     description=("A collection of simple reusable Django utility modules."),
     license="BSD",
     keywords="example documentation tutorial",
     url="https://github.com/kdmukai/microdev",
-    packages=['microdev'],
+    packages=['microdev', 'microdev.cached', 'microdev.csv', 'microdev.google_client_api', 'microdev.migrations', 'microdev.postal_address', 'microdev.templatetags'],
+    package_data={'templates':['*'],},
     # long_description=read('README.md'),
     classifiers=[
         "Development Status :: 5 - Production/Stable",
