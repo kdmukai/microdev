@@ -1,0 +1,17 @@
+Update setup.py to add subdirs to the build:
+    packages=['microdev', 'microdev.cached', 'microdev.csv', 'microdev.google_client_api', 'microdev.migrations', 'microdev.postal_address', 'microdev.templatetags'],
+
+
+Release new version:
+- Update version num in setup.py
+
+- Register new version with pypi:
+python setup.py register
+
+- Build and upload dists:
+python setup.py sdist upload
+python setup.py bdist_egg upload
+python setup.py bdist_wininst upload
+
+- Update dependent projects
+pip install -U microdev
