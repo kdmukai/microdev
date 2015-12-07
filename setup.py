@@ -11,7 +11,7 @@ def read(fname):
 
 setup(
     name="microdev",
-    version="0.0.8",
+    version="0.0.9",
     author="Keith Mukai",
     author_email="keith.mukai@essaytagger.com",
     description=("A collection of simple reusable Django utility modules."),
@@ -20,6 +20,9 @@ setup(
     url="https://github.com/kdmukai/microdev",
     packages=find_packages(),
     include_package_data=True,
+    install_requires=[
+        'django >= 1.7.0',
+    ],
     # long_description=read('README.md'),
     classifiers=[
         "Development Status :: 5 - Production/Stable",

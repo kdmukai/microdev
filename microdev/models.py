@@ -5,8 +5,7 @@ from django_extensions.db.fields import CreationDateTimeField, ModificationDateT
 import shortuuid
 
 from django.contrib.contenttypes.models import ContentType
-
-from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.fields import GenericForeignKey
 
 from django.conf import settings
 
@@ -42,7 +41,7 @@ class ChangeLog(models.Model):
 
 	object_content_type = models.ForeignKey(ContentType, related_name="%(app_label)s_%(class)s_object_content_type", null=True)
 	obj_id              = models.IntegerField()
-	object_instance     = generic.GenericForeignKey('object_content_type', 'obj_id')
+	object_instance     = GenericForeignKey('object_content_type', 'obj_id')
 	# By combining 'object_content_type' and 'obj_id' we are able to get the actual model instance for which we are saving the ChangeLog
 	
 	date_created        = CreationDateTimeField()
